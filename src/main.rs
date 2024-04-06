@@ -3,8 +3,12 @@
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
+#![feature(abi_x86_interrupt)]
 
-mod terminal;
+pub mod interrupts;
+
+pub mod terminal;
+
 use core::panic::PanicInfo;
 
 #[cfg(test)]
@@ -21,9 +25,15 @@ fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
+fn init() {
+    interrupts::init_idt();
+}
+
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    println!("Starting!");
+    println!("Welcome!");
+
+    init();
 
     #[cfg(test)]
     test_main();
