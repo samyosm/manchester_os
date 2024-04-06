@@ -5,8 +5,8 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+mod gdt;
 pub mod interrupts;
-
 pub mod terminal;
 
 use core::panic::PanicInfo;
@@ -26,6 +26,7 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 fn init() {
+    gdt::init_gdt();
     interrupts::init_idt();
 }
 
