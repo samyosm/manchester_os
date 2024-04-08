@@ -1,6 +1,7 @@
 use core::fmt;
 
 use spin::{Mutex, Once};
+use x86_64::instructions::interrupts;
 
 use super::{
     color::{Color, ColorCode},
@@ -121,7 +122,9 @@ macro_rules! println {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    Writer::std_global().write_fmt(args).unwrap();
+    interrupts::without_interrupts(|| {
+        Writer::std_global().write_fmt(args).unwrap();
+    })
 }
 
 #[macro_export]
@@ -138,5 +141,8 @@ macro_rules! eprintln {
 #[doc(hidden)]
 pub fn _eprint(args: fmt::Arguments) {
     use core::fmt::Write;
-    Writer::err_global().write_fmt(args).unwrap();
+
+    interrupts::without_interrupts(|| {
+        Writer::err_global().write_fmt(args).unwrap();
+    })
 }
